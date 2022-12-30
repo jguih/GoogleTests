@@ -7,18 +7,24 @@ namespace Tests
     [TestClass]
     public class GoogleTests
     {
-        public static IWebDriver GetDriver()
+        public IWebDriver driver;
+
+        [TestInitialize]
+        public void TestInitialize()
         {
-            IWebDriver driver = new EdgeDriver();
+            driver = new EdgeDriver();
             driver.Navigate().GoToUrl("https://www.google.com.br/");
-            return driver;
+        }
+
+        [TestCleanup]
+        public void TestCleanup()
+        {
+            driver.Quit();
         }
 
         [TestMethod]
         public void GoogleSearch()
         {
-            var driver = GetDriver();
-
             // Seleciona a caixa de pesquisa
             var searchInput = driver.FindElement(By.Name("q"));
             // Digita 'selenium' na caixa de pesquisa
@@ -26,44 +32,48 @@ namespace Tests
             searchInput.SendKeys("selenium" + Keys.Enter);
             // Verifica se a url contem o parametro de pesquisa
             Assert.IsTrue(driver.Url.Contains("/search?q=selenium"));
-
-            driver.Quit();
         }
 
         [TestMethod]
         public void GoogleSearchBySubmit()
         {
-            var driver = GetDriver();
-
             var searchInput = driver.FindElement(By.Name("q"));
             searchInput.SendKeys("selenium");
 
-            // Espera a interface atualizar e mostrar o botao de submit
-            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromMilliseconds(500);
+            // Espera o botao de submit ficar visivel
+            new WebDriverWait(driver, TimeSpan.FromSeconds(10))
+                .Until(driver => driver.FindElement(By.Name("btnK")).Displayed);
 
             var submit = driver.FindElement(By.Name("btnK"));
             submit.Click();
 
             Assert.IsTrue(driver.Url.Contains("/search?q=selenium"));
-
-            driver.Quit();
         }
 
         [TestMethod]
         public void IsVirtualKeyBoardVisible()
         {
-            var driver = GetDriver();
-
             var kbButton = driver.FindElement(By.ClassName("Umvnrc"));
             kbButton.Click();
 
-            // Espera ateh que o teclado esteja visivel
-            var virtualKb = new WebDriverWait(driver, TimeSpan.FromSeconds(10))
-                .Until(driver => driver.FindElement(By.Id("kbd")));
+            // Espera o teclado ficar visivel
+            new WebDriverWait(driver, TimeSpan.FromSeconds(10))
+                .Until(driver => driver.FindElement(By.Id("kbd")).Displayed);
+        }
 
-            Assert.IsTrue(virtualKb.Displayed);
+        [TestMethod]
+        public void ClearButton()
+        {
+            var searchInput = driver.FindElement(By.Name("q"));
+            searchInput.SendKeys("selenium");
 
-            driver.Quit();
+            // Espera o botao que limpa a caixa de pesquisa ficar visivel
+            new WebDriverWait(driver, TimeSpan.FromSeconds(10))
+                .Until(driver => driver.FindElement(By.CssSelector(".vOY7J.M2vV3")).Displayed);
+
+            var clearBtn = driver.FindElement(By.CssSelector(".vOY7J.M2vV3"));
+            clearBtn.Click();
+            Assert.IsTrue(searchInput.Text == "");
         }
     }
 }
