@@ -23,7 +23,7 @@ namespace Tests
         }
 
         [TestMethod]
-        public void GoogleSearch()
+        public void SearchSubmitByEnter()
         {
             // Seleciona a caixa de pesquisa
             var searchInput = driver.FindElement(By.Name("q"));
@@ -35,17 +35,26 @@ namespace Tests
         }
 
         [TestMethod]
-        public void GoogleSearchBySubmit()
+        public void SearchSubmitByButton()
         {
             var searchInput = driver.FindElement(By.Name("q"));
             searchInput.SendKeys("selenium");
 
-            // Espera o botao de submit ficar visivel
+            // Espera a div que contem o botao 'Pesquisa Google' ficar visivel
             new WebDriverWait(driver, TimeSpan.FromSeconds(10))
-                .Until(driver => driver.FindElement(By.Name("btnK")).Displayed);
+                .Until(driver => driver.FindElement(By.ClassName("lJ9FBc")).Displayed);
 
-            var submit = driver.FindElement(By.Name("btnK"));
-            submit.Click();
+            // Seleciona os botoes 'Pesquisa Google' e 'Estou com sorte' a partir de uma div
+            var btns = driver.FindElements(By.CssSelector(".lJ9FBc input"));
+
+            foreach (IWebElement e in btns)
+            {
+                if (e.GetAttribute("value") == "Pesquisa Google")
+                {
+                    e.Click();
+                    break;
+                }
+            }
 
             Assert.IsTrue(driver.Url.Contains("/search?q=selenium"));
         }
@@ -73,7 +82,25 @@ namespace Tests
 
             var clearBtn = driver.FindElement(By.CssSelector(".vOY7J.M2vV3"));
             clearBtn.Click();
+
             Assert.IsTrue(searchInput.Text == "");
+        }
+
+        [TestMethod]
+        public void Doodles()
+        {
+            // Seleciona os botoes 'Pesquisa Google' e 'Estou com sorte' a partir de uma div
+            var btns = driver.FindElements(By.CssSelector(".FPdoLc.lJ9FBc input"));
+            
+            foreach(IWebElement e in btns) { 
+                if(e.GetAttribute("value") == "Estou com sorte")
+                {
+                    e.Click();
+                    break;
+                }
+            }
+
+            Assert.IsTrue(driver.Url == "https://www.google.com/doodles");
         }
     }
 }
