@@ -33,7 +33,7 @@ Os testes serão executados e o resultado aparecerá no terminal
 
 #### Abra a solução do projeto no Visual Studio
 
-É possível abrir a solução de duas formas:
+É possível abrir a solução de três formas:
 
 1. Com o Visual Studio aberto, no menu superior, clique em Arquivo > Abrir > Projeto/Solução
 
